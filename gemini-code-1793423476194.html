@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Süper Lig 2026-27 | Harita ve Oy Oyunu</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --champion: #10b981;
+            --relegation: #ef4444;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        h1 { margin: 0; font-size: 1.8rem; color: #fbbf24; }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+        
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media(min-width: 900px) {
+            .container { grid-template-columns: 1fr 1fr; }
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .card h2 { margin-top: 0; font-size: 1.3rem; border-bottom: 2px solid #334155; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        
+        /* Takım Listesi ve Oy Verme */
+        .team-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .team-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #334155;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .team-info { display: flex; align-items: center; gap: 10px; }
+        .team-logo { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; color: white;}
+        
+        button {
+            background-color: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #0ea5e9; color: white; }
+        button:disabled { background-color: #475569; color: #94a3b8; cursor: not-allowed; }
+
+        /* Yönetici Paneli */
+        .admin-panel {
+            background: #1e1b4b;
+            border: 2px dashed #6366f1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        /* Puan Durumu Tablosu */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background-color: #1e293b; color: var(--text-muted); }
+        .row-champion { background-color: rgba(16, 185, 129, 0.15); border-left: 4px solid var(--champion); }
+        .row-relegation { background-color: rgba(239, 68, 68, 0.15); border-left: 4px solid var(--relegation); }
+
+        /* Harita Alanı */
+        .map-container {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+        .map-box {
+            background: #020617;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #334155;
+        }
+        .city-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .city-tag {
+            background: #1e293b;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Süper Lig 2026-27 Şampiyonluk & Harita Oyunu</h1>
+        <div class="subtitle" id="weekDisplay">Mevcut Hafta: 1. Hafta</div>
+    </header>
+
+    <div class="container">
+        <!-- SOL: OY VERME ALANI -->
+        <div class="card">
+            <h2>Haftalık Oy Ver <span id="voteStatus" style="font-size: 0.8rem; color: var(--champion);"></span></h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Bu hafta desteklediğiniz takıma 1 oyunuzu verin! (Her hafta 1 oy hakkınız vardır)</p>
+            <div class="team-list" id="votingTeamList">
+                <!-- Javascript ile dolacak -->
+            </div>
+
+            <!-- YÖNETİCİ KONTROL PANELİ (Sadece sizin kontrolünüzde) -->
+            <div class="admin-panel">
+                <h3 style="margin:0 0 10px 0; font-size:1rem; color:#818cf8;">🔒 Yönetici Paneli (Haftayı İlerlet)</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Bu buton sadece kurucu olarak haftayı kapatıp puanları tescillemenizi sağlar.</p>
+                <button onclick="advanceWeek()" style="background-color: #10b981; width: 100%;">Haftayı Bitir ve Puanları Güncelle ➡️</button>
+            </div>
+        </div>
+
+        <!-- SAĞ: PUAN DURUMU -->
+        <div class="card">
+            <h2>Puan Durumu</h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sıra</th>
+                            <th>Takım</th>
+                            <th>O</th>
+                            <th>P</th>
+                            <th>Şehir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingsTableBody">
+                        <!-- Javascript ile dolacak -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ALT: TÜRKİYE HARİTASI & ŞEHİR DAĞILIMI -->
+        <div class="card map-container">
+            <h2>🗺️ Türkiye Haritası & Şehir Hakimiyetleri</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Takımların puan üstünlüğüne göre 81 ilin dağılımı:</p>
+            <div class="map-box">
+                <div id="mapSummary" style="font-weight: bold; color: var(--accent); margin-bottom: 10px;">Henüz puan alınmadı. Şehirler sahibini bekliyor!</div>
+                <div class="city-grid" id="cityGrid">
+                    <!-- 81 il listesi -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 2026-2027 Süper Lig Takımları (0 Puan, 0 Oy ile başlar)
+        let teams = [
+            { id: 'gs', name: 'Galatasaray', color: '#a855f7', pts: 0, votes: 0, cities: 0 },
+            { id: 'fb', name: 'Fenerbahçe', color: '#eab308', pts: 0, votes: 0, cities: 0 },
+            { id: 'bjk', name: 'Beşiktaş', color: '#475569', pts: 0, votes: 0, cities: 0 },
+            { id: 'ts', name: 'Trabzonspor', color: '#3b82f6', pts: 0, votes: 0, cities: 0 },
+            { id: 'ibfk', name: 'Başakşehir', color: '#0284c7', pts: 0, votes: 0, cities: 0 },
+            { id: 'ads', name: 'Adana Demirspor', color: '#0f172a', pts: 0, votes: 0, cities: 0 },
+            { id: 'ant', name: 'Antalyaspor', color: '#ef4444', pts: 0, votes: 0, cities: 0 },
+            { id: 'kon', name: 'Konyaspor', color: '#22c55e', pts: 0, votes: 0, cities: 0 },
+            { id: 'aln', name: 'Alanyaspor', color: '#f97316', pts: 0, votes: 0, cities: 0 },
+            { id: 'kys', name: 'Kayserispor', color: '#e11d48', pts: 0, votes: 0, cities: 0 },
+            { id: 'siv', name: 'Sivasspor', color: '#dc2626', pts: 0, votes: 0, cities: 0 },
+            { id: 'gzt', name: 'Göztepe', color: '#facc15', pts: 0, votes: 0, cities: 0 },
+            { id: 'sam', name: 'Samsunspor', color: '#dc2626', pts: 0, votes: 0, cities: 0 },
+            { id: 'riz', name: 'Çaykur Rizespor', color: '#10b981', pts: 0, votes: 0, cities: 0 },
+            { id: 'eyu', name: 'Eyüpspor', color: '#7c3aed', pts: 0, votes: 0, cities: 0 },
+            { id: 'koc', name: 'Kocaelispor', color: '#15803d', pts: 0, votes: 0, cities: 0 },
+            { id: 'amd', name: 'Amed SFK', color: '#16a34a', pts: 0, votes: 0, cities: 0 },
+            { id: 'sak', name: 'Sakaryaspor', color: '#1d4ed8', pts: 0, votes: 0, cities: 0 }
+        ];
+
+        let currentWeek = 1;
+        let hasVotedThisWeek = false;
+
+        // 81 İl Listesi
+        const citiesList = [
+            "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın", "Balıkesir",
+            "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli",
+            "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari",
+            "Hatay", "Isparta", "Mersin", "İstanbul", "İzmir", "Kars", "Kastamonu", " Kayseri", "Kırklareli", "Kırşehir",
+            "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir",
+            "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat",
+            "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman",
+            "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"
+        ];
+
+        function renderApp() {
+            // Sıralama (Puana göre, eşitlikte oya göre)
+            teams.sort((a, b) => b.pts - b.pts || b.votes - a.votes);
+
+            // Şehirleri puanlara göre orantılı paylaştır
+            distributeCities();
+
+            // Arayüzleri Güncelle
+            renderVotingList();
+            renderStandings();
+            renderMapCities();
+            document.getElementById('weekDisplay').innerText = `Mevcut Hafta: ${currentWeek}. Hafta`;
+        }
+
+        function renderVotingList() {
+            const list = document.getElementById('votingTeamList');
+            list.innerHTML = '';
+            teams.forEach(team => {
+                list.innerHTML += `
+                    <div class="team-item">
+                        <div class="team-info">
+                            <div class="team-logo" style="background-color: ${team.color}">${team.name.substring(0,2).toUpperCase()}</div>
+                            <span>${team.name}</span>
+                        </div>
+                        <button onclick="voteTeam('${team.id}')" ${hasVotedThisWeek ? 'disabled' : ''}>
+                            ${hasVotedThisWeek ? 'Oy Verildi' : 'Oy Ver (+3 Puan)'}
+                        </button>
+                    </div>
+                `;
+            });
+            document.getElementById('voteStatus').innerText = hasVotedThisWeek ? "(Bu hafta oyunuzu kullandınız)" : "";
+        }
+
+        function voteTeam(teamId) {
+            if (hasVotedThisWeek) return;
+            const team = teams.find(t => t.id === teamId);
+            if (team) {
+                team.votes += 1;
+                team.pts += 3; // Oy veren takım haftalık 3 puan alır
+                hasVotedThisWeek = true;
+                renderApp();
+                alert(`Tebrikler! ${team.name} takımına oyunuz başarıyla verildi.`);
+            }
+        }
+
+        function advanceWeek() {
+            // YÖNETİCİ ÖZELLİĞİ: Haftayı bitirir, yeni haftaya geçer
+            currentWeek += 1;
+            hasVotedThisWeek = false; // Yeni hafta için oy hakkı sıfırlanır
+            
+            // Yapay taraftar oylarını simüle et (Diğer takımlara rastgele oy/puan ekleme)
+            teams.forEach(t => {
+                let randomBonus = Math.floor(Math.random() * 3); // Rastgele destek
+                t.pts += randomBonus * 3;
+            });
+
+            renderApp();
+            alert(`${currentWeek}. Hafta başlatıldı! Oy verme hakları yenilendi.`);
+        }
+
+        function renderStandings() {
+            const tbody = document.getElementById('standingsTableBody');
+            tbody.innerHTML = '';
+            const totalTeams = teams.length;
+
+            teams.forEach((team, index) => {
+                let rowClass = '';
+                if (index === 0) rowClass = 'row-champion'; // Şampiyonluk
+                else if (index >= totalTeams - 3) rowClass = 'row-relegation'; // Küme Düşme
+
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td><strong>${index + 1}</strong></td>
+                        <td>${team.name}</td>
+                        <td>${currentWeek - 1}</td>
+                        <td><strong>${team.pts}</strong></td>
+                        <td>📍 ${team.cities}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function distributeCities() {
+            let totalPts = teams.reduce((sum, t) => sum + t.pts, 0);
+            let assignedCities = 0;
+
+            if (totalPts === 0) {
+                teams.forEach(t => t.cities = 0);
+                return;
+            }
+
+            teams.forEach((team, idx) => {
+                if (idx === teams.length - 1) {
+                    // Kalan şehirleri son takıma ver
+                    team.cities = 81 - assignedCities;
+                } else {
+                    let share = Math.round((team.pts / totalPts) * 81);
+                    team.cities = share;
+                    assignedCities += share;
+                }
+            });
+        }
+
+        function renderMapCities() {
+            const grid = document.getElementById('cityGrid');
+            grid.innerHTML = '';
+            
+            // Şehirleri takımlara göre eşleştirme gösterimi
+            let cityIndex = 0;
+            teams.forEach(team => {
+                for (let i = 0; i < team.cities && cityIndex < citiesList.length; i++) {
+                    let cityName = citiesList[cityIndex++];
+                    grid.innerHTML += `
+                        <div class="city-tag" style="border-left-color: ${team.color}">
+                            <span>${cityName}</span>
+                            <strong style="font-size: 0.75rem; color:${team.color}">${team.name}</strong>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Başlangıç Çalıştırma
+        renderApp();
+    </script>
+</body>
+</html>
